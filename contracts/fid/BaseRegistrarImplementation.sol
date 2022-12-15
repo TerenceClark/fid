@@ -147,7 +147,7 @@ contract BaseRegistrarImplementation is ERC721, BaseRegistrar  {
         fid.setSubnodeOwner(baseNode, bytes32(id), owner);
     }
 
-    function supportsInterface(bytes4 interfaceID) public override(ERC721, IERC165) view returns (bool) {
+    function supportsInterface(bytes4 interfaceID) public override(ERC721, IERC165) pure returns (bool) {
         return interfaceID == INTERFACE_META_ID ||
                interfaceID == ERC721_ID ||
                interfaceID == RECLAIM_ID;
