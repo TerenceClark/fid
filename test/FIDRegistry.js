@@ -26,5 +26,30 @@ describe("FIDRegistry tests", function () {
         await expect(fidRegistry.setSubnodeOwner(namehash(clarkFID), labelhash("home"), addr3.address)).to.be.reverted
         await fidRegistry.connect(addr2).setSubnodeOwner(namehash(clarkFID), labelhash("home"), addr3.address)
         expect(await fidRegistry.owner(namehash(clarkHomeFID))).to.equal(addr3.address)
+
+        const PublicResolver = await ethers.getContractFactory("PublicResolver");
+        const publicResolver = await PublicResolver.deploy(fidRegistry.address);
+        const testFilAddr = 'f3rcv4fu5fotam2jlqhbmer66exna5epu4jxin6gksp5pb76lufdp5giayhknqhsi43yx2e5vxj5vxyajqf4iq'
+        await publicResolver.connect(addr2)['setAddr(bytes32,uint256,bytes)'](namehash(clarkFID), 61, utils.toUtf8Bytes(testFilAddr))
+        // addr(bytes32)
+        // addr(bytes32,uint256)
+        let resolvedFilAddrBytes = await publicResolver['addr(bytes32,uint256)'](namehash(clarkFID), 61)
+        expect(utils.toUtf8String(resolvedFilAddrBytes)).to.equal(testFilAddr)
+        await expect(fidRegistry.setResolver(namehash(clarkFID), publicResolver.address)).to.be.reverted
+        await fidRegistry.connect(addr2).setResolver(namehash(clarkFID), publicResolver.address)
+        expect(await fidRegistry.resolver(namehash(clarkFID))).to.equal(publicResolver.address)
+
+        const clarkXFID = "x.clark.fid"
+        await expect(fidRegistry.setSubnodeRecord(namehash(clarkFID), labelhash('x'), addr3.address, publicResolver.address, 300)).to.be.reverted
+        await fidRegistry.connect(addr2).setSubnodeRecord(namehash(clarkFID), labelhash('x'), addr3.address, publicResolver.address, 300)
+        await expect(fidRegistry.setOwner(namehash(clarkXFID), addr4.address)).to.be.reverted
+        await expect(fidRegistry.setRecord(namehash(clarkXFID), addr4.address, publicResolver.address, 200)).to.be.reverted
+        await fidRegistry.connect(addr3).setApprovalForAll(deployer.address, true)
+        await fidRegistry.setRecord(namehash(clarkXFID), addr4.address, publicResolver.address, 200)
+        expect(await fidRegistry.owner(namehash(clarkXFID))).to.equal(addr4.address)
+        await expect(fidRegistry.connect(addr3).setOwner(namehash(clarkXFID), addr4.address)).to.be.reverted
+        await expect(fidRegistry.connect(addr3).setTTL(namehash(clarkXFID), 100)).to.be.reverted
+        await fidRegistry.connect(addr4).setTTL(namehash(clarkXFID), 100)
+        expect(await fidRegistry.ttl(namehash(clarkXFID))).to.equal(100)
     });
 });
