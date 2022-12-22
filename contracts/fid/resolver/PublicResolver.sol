@@ -5,15 +5,13 @@ import "../FID.sol";
 import "./profiles/AddrResolver.sol";
 import "./profiles/InterfaceResolver.sol";
 import "./profiles/NameResolver.sol";
-import "./profiles/PubkeyResolver.sol";
-import "./profiles/TextResolver.sol";
 import "./Multicallable.sol";
 
 /**
  * A simple resolver anyone can use; only allows the owner of a node to set its
  * address.
  */
-contract PublicResolver is Multicallable, AddrResolver, InterfaceResolver, NameResolver, PubkeyResolver, TextResolver {
+contract PublicResolver is Multicallable, AddrResolver, NameResolver, InterfaceResolver {
     FID fid;
 
     /**
@@ -56,7 +54,7 @@ contract PublicResolver is Multicallable, AddrResolver, InterfaceResolver, NameR
         return _operatorApprovals[account][operator];
     }
 
-    function supportsInterface(bytes4 interfaceID) public override(Multicallable, AddrResolver, InterfaceResolver, NameResolver, PubkeyResolver, TextResolver) pure returns(bool) {
+    function supportsInterface(bytes4 interfaceID) public override(Multicallable, AddrResolver, NameResolver, InterfaceResolver) pure returns(bool) {
         return interfaceID == type(IMulticallable).interfaceId || super.supportsInterface(interfaceID);
     }
 }
