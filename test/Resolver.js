@@ -8,8 +8,8 @@ const domainName = "fid"
 const domainNamehash = namehash(domainName)
 const domainLabelhash = labelhash(domainName)
 
-describe("ReverseRegistrar tests", function () {
-    it("set and get name", async function () {
+describe("Resolver tests", function () {
+    it("set and get addr", async function () {
         const [deployer, addr2, addr3, addr4, addr5, addr6] = await ethers.getSigners();
 
         const FIDRegistry = await ethers.getContractFactory("FIDRegistry");
